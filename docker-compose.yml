@@ -1,0 +1,34 @@
+version: '2'
+networks:
+  sp-homework:
+
+services:
+  php:
+    image: yiisoftware/yii2-php:8.1-apache
+    volumes:
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      - ./:/app:delegated
+    ports:
+      - '8000:80'
+    networks:
+      - sp-homework
+
+  pgsql:
+      image: postgres:13
+      ports:
+        - '5432:5432'
+      environment:
+        PGPASSWORD: 'secret'
+        POSTGRES_DB: 'postgres'
+        POSTGRES_USER: 'root'
+        POSTGRES_PASSWORD: 'secret'
+      volumes:
+        - 'pgsql:/var/lib/postgresql/data'
+      networks:
+        - sp-homework
+      healthcheck:
+        test: ["CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root"]
+
+volumes:
+    pgsql:
+        driver: local
